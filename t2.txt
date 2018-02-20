@@ -1,0 +1,11 @@
+A = l1, l2
+B = l4, l5, l3
+C = l6, l7
+D = l8, l12
+E = l9, l10
+F = l11
+G = l13, l14
+A: E, G
+E: B, D
+G: F, C
+
