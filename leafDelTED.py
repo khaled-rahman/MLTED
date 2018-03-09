@@ -54,9 +54,6 @@ def PWAT(nS, nT, S, T, Sparent, Tparent):
 			continue
 		for c2 in T[p2]:
 			Q2.put(c2)
-	
-	bfsOrderT1P = bfsOrderT1
-	bfsOrderT2P = bfsOrderT2
 
 	for a in bfsOrderT1:
 		Q1 = Queue.Queue()
