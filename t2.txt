@@ -1,5 +1,5 @@
 A = l1, l2
-B = l4, l5, l3
+B = l3, l4, l5
 C = l6, l7
 D = l8, l12
 E = l9, l10
