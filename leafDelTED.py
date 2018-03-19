@@ -16,6 +16,7 @@ def createLabels(line):
 	labels = line.strip().replace(" ","").split("=")[1].split(",")
 	return node, labels
 
+
 def SAP(S, T):
 	Tab = [[0 for i in range(len(S))] for j in range(len(T))]
 	for i in range(len(S)):
@@ -116,18 +117,45 @@ def createGraph(nodes, edges, cost):
 		w = cost[e]
 		G.add_edge(i,j, weight = w, capacity = 1)
 
-	
+def findLCA(node1, node2, T1parent):
+
+	nV1 = []
+	nV2 = []
+
+	while node1 in T1parent.keys():
+		nV1.append(node1)
+		node1 = T1parent[node1]
+	nV1.append(node1)
+	print nV1
+
+	while node2 in T2parent.keys():
+		nV2.append(node2)
+		node2 = T2parent[node2]
+	nV2.append(node2)
+	nV1[:] = nV1[::-1]
+	nV2[:] = nV2[::-1]
+	for i in range(min(len(nV1), len(nV2))):
+		if nV1[i] == nV2[i]:
+			lca = nV1[i]
+		else:
+			break
+	print lca
+
+	return lca
+
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		l1, n1, T1adj, T1parent = readTreeFile(sys.argv[1])
 		l2, n2, T2adj, T2parent = readTreeFile(sys.argv[2])
 		#print l1
 		#print n1
+		#print T1adj
 		#print T1parent
 		sap = SAP(l1, l2)
 		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent)
-		print sap
-		print pwat
+		lca = findLCA('F', 'E', T1parent)
+		#print sap
+		#print pwat
 		
 
 	
