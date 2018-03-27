@@ -2,7 +2,6 @@ import os
 import sys
 from sets import Set
 import Queue
-import networkx as nx
 import matplotlib.pyplot as plt
 
 
@@ -26,8 +25,6 @@ def SAP(S, T):
 	for i in range(1, len(S)):
 		for j in range(1, len(T)):
 			Tab[i][j] = max(Tab[i-1][j], Tab[i][j-1])+len(list(set(S[i]).intersection(set(T[j]))))
-	#for r in Tab:
-	#	print r
 	return Tab
 
 def PWAT(nS, nT, S, T, Sparent, Tparent):
@@ -66,15 +63,14 @@ def PWAT(nS, nT, S, T, Sparent, Tparent):
 				Q2.put(c)
 				while not Q2.empty():
 					d = Q2.get()
-					#print 'Node:',a, b, c, d
 					if a == b and c == d:
-						patDict["".join(a+b+c+d)] = len(list(set(nS[b]).intersection(set(nT[d]))))
+						patDict["".join(a+c+b+d)] = len(list(set(nS[b]).intersection(set(nT[d]))))
 					elif a == b and c != d:
-						patDict["".join(a+b+c+d)] = patDict["".join(a+b+c+Tparent[d])] + len(list(set(nS[b]).intersection(set(nT[d]))))
+						patDict["".join(a+c+b+d)] = patDict["".join(a+c+b+Tparent[d])] + len(list(set(nS[b]).intersection(set(nT[d]))))
 					elif a != b and c == d:
-						patDict["".join(a+b+c+d)] = patDict["".join(a+Sparent[b]+c+d)] + len(list(set(nS[b]).intersection(set(nT[d]))))
+						patDict["".join(a+c+b+d)] = patDict["".join(a+c+Sparent[b]+d)] + len(list(set(nS[b]).intersection(set(nT[d]))))
 					else:
-						patDict["".join(a+b+c+d)] = max(patDict["".join(a+b+c+Tparent[d])], patDict["".join(a+Sparent[b]+c+d)]) + len(list(set(nS[b]).intersection(set(nT[d]))))
+						patDict["".join(a+c+b+d)] = max(patDict["".join(a+c+b+Tparent[d])], patDict["".join(a+c+Sparent[b]+d)]) + len(list(set(nS[b]).intersection(set(nT[d]))))
 					if d not in T:
 						continue
 					for c2 in T[d]:
@@ -83,7 +79,6 @@ def PWAT(nS, nT, S, T, Sparent, Tparent):
 				continue
 			for c1 in S[b]:
 				Q1.put(c1)
-	#print patDict
 	return patDict
 
 
@@ -118,7 +113,6 @@ def createGraph(nodes, edges, cost):
 		G.add_edge(i,j, weight = w, capacity = 1)
 
 def findLCA(node1, node2, T1parent):
-
 	nV1 = []
 	nV2 = []
 
@@ -143,6 +137,164 @@ def findLCA(node1, node2, T1parent):
 
 	return lca
 
+def improveMatching(v):
+    u = T[v]
+    if u in Mu:
+        improveMatching(Mu[u])
+    Mu[u] = v
+    Mv[v] = u
+
+def augmentPath():
+    while True:
+        ((val, u), v) = min([(minSlack[v], v) for v in V if v not in T])
+        assert u in S
+        if val>0:        
+           	for i in S:
+        		lu[i] -= val
+    		for j in V:
+        		if j in T:
+        			lv[j] += val
+        		else:
+        			minSlack[j][0] -= val
+        assert lu[u]+lv[v]-w[u][v]==0
+        T[v] = u                          
+        if v in Mv:
+            u1 = Mv[v]                     
+            assert not u1 in S
+            S[u1] = True                 
+            for v in V:                  
+                if not v in T and minSlack[v][0] > lu[u1]+lv[v]-w[u1][v]:
+                    minSlack[v] = [lu[u1]+lv[v]-w[u1][v], u1]
+        else:
+            improveMatching(v)          
+            return
+
+def maxBipartiteMatching(weights):
+	#Kuhn Munkres @hungarian algorithm
+	#https://pypi.python.org/pypi/munkres/1.0.5.4
+    global U,V,S,T,Mu,Mv,lu,lv, minSlack, w
+    w  = weights
+    n  = len(w)
+    U  = V = range(n)
+    lu = [ max([w[u][v] for v in V]) for u in U]
+    lv = [ 0                         for v in V]
+    Mu = {}                                      
+    Mv = {}
+    while len(Mu)<n:
+        free = [u for u in V if u not in Mu]     
+        u0 = free[0]
+        S = {u0: True}                  
+        T = {}
+        minSlack = [[lu[u0]+lv[v]-w[u0][v], u0] for v in V]
+        augmentPath()
+    val = sum(lu)+sum(lv)
+    return (Mu, Mv, val)
+
+
+def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
+	G = dict()
+	dfsOrderT1 = []
+	dfsOrderT2 = []
+	STACK1 = []
+	parent1 = S.iterkeys().next()
+	STACK1.append(parent1)
+	STACK2 = []
+	parent2 = T.iterkeys().next()
+	STACK2.append(parent2)
+	visited = []
+	while len(STACK1) > 0:
+		p1 = STACK1[len(STACK1) - 1]
+		if p1 not in S or p1 in visited:
+			dfsOrderT1.append(p1)
+			STACK1.pop()
+			continue
+		visited.append(p1)
+		for c1 in S[p1]:
+			STACK1.append(c1)
+	visited = []
+	while len(STACK2) > 0:
+		p2 = STACK2[len(STACK2) - 1]
+		if p2 not in T or p2 in visited:
+			dfsOrderT2.append(p2)
+			STACK2.pop()
+			continue
+		visited.append(p2)
+		for c2 in T[p2]:
+			STACK2.append(c2)
+	print dfsOrderT1
+	print dfsOrderT2
+	for n1 in dfsOrderT1:
+		F = []
+		if n1 in S:
+			F = [i for i in S[n1]]
+		for n2 in dfsOrderT2:
+			H = []
+			if n2 in T:
+				H = [j for j in T[n2]]
+			#print n1, n2, ":", F, H
+			if len(F) == 0 and len(H) == 0:
+				G["".join(n1+n2)] = pwat["".join(n1+n2+n1+n2)]
+			elif len(F) == 0 and len(H) != 0:
+				for c in H:
+					if "".join(n1+n2) in G:
+						if pwat["".join(n1+n2+n1+c)] > G["".join(n1+n2)]:
+							G["".join(n1+n2)] =  pwat["".join(n1+n2+n1+c)]
+					else:
+						G["".join(n1+n2)] = pwat["".join(n1+n2+n1+c)]
+			elif len(F) != 0 and len(H) == 0:
+				for c in F:
+					if "".join(n1+n2) in G:
+						if pwat["".join(n1+n2+c+n2)] > G["".join(n1+n2)]:
+							G["".join(n1+n2)] = pwat["".join(n1+n2+c+n2)]
+					else:
+						G["".join(n1+n2)] = pwat["".join(n1+n2+c+n2)]
+			else:
+				Cost = []
+				for c1 in F:
+					nodesofSubtreec1 = []
+					subQ1 = Queue.Queue()
+					subQ1.put(c1)
+					while not subQ1.empty():
+						sn1 = subQ1.get()
+						nodesofSubtreec1.append(sn1)
+						if sn1 not in S:
+							continue
+						for subc1 in S[sn1]:
+							subQ1.put(subc1)
+					subCost = []
+					for c2 in H:
+						nodesofSubtreec2 = []
+						subQ2 = Queue.Queue()
+						subQ2.put(c2)
+						while not subQ2.empty():
+							sn2 = subQ2.get()
+							nodesofSubtreec2.append(sn2)
+							if sn2 not in T:
+								continue
+							for subc2 in T[sn2]:
+								subQ2.put(subc2)
+						# if "".join(n1+n2) in G:
+						# 	if pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)] > G["".join(c1+c2)]:
+						# 		G["".join(n1+n2)] = pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)]
+						# else:
+						# 	G["".join(n1+n2)] = pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)]
+						allCost = []
+						for c in nodesofSubtreec1:
+							for d in nodesofSubtreec2:
+								allCost.append(pwat["".join(c1+c2+c+d)] + G["".join(c+d)])
+						#bG["".join(c1+c2)] = max(allCost)
+						subCost.append(max(allCost))
+					Cost.append(subCost)
+				print F, H
+				print Cost
+				(n,n, val) = maxBipartiteMatching(Cost)
+				G["".join(n1+n2)] = val
+				print val
+								
+	print G
+
+	return G
+
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		l1, n1, T1adj, T1parent = readTreeFile(sys.argv[1])
@@ -151,11 +303,16 @@ if __name__ == '__main__':
 		#print n1
 		#print T1adj
 		#print T1parent
-		sap = SAP(l1, l2)
+		#sap = SAP(l1, l2)
 		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent)
-		lca = findLCA('F', 'E', T1parent)
+		#print pwat
+		#lca = findLCA('F', 'E', T1parent)
 		#print sap
 		#print pwat
+		dfs = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
+		vals = dfs.values()
+		print "Output:", max(vals)
+		#print dfs
 		
 
 	
