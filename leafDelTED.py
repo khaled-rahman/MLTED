@@ -3,6 +3,7 @@ import sys
 from sets import Set
 import Queue
 import matplotlib.pyplot as plt
+from munkres import Munkres, make_cost_matrix
 
 
 def createParentChildren(line):
@@ -137,58 +138,6 @@ def findLCA(node1, node2, T1parent):
 
 	return lca
 
-def improveMatching(v):
-    u = T[v]
-    if u in Mu:
-        improveMatching(Mu[u])
-    Mu[u] = v
-    Mv[v] = u
-
-def augmentPath():
-    while True:
-        ((val, u), v) = min([(minSlack[v], v) for v in V if v not in T])
-        assert u in S
-        if val>0:        
-           	for i in S:
-        		lu[i] -= val
-    		for j in V:
-        		if j in T:
-        			lv[j] += val
-        		else:
-        			minSlack[j][0] -= val
-        assert lu[u]+lv[v]-w[u][v]==0
-        T[v] = u                          
-        if v in Mv:
-            u1 = Mv[v]                     
-            assert not u1 in S
-            S[u1] = True                 
-            for v in V:                  
-                if not v in T and minSlack[v][0] > lu[u1]+lv[v]-w[u1][v]:
-                    minSlack[v] = [lu[u1]+lv[v]-w[u1][v], u1]
-        else:
-            improveMatching(v)          
-            return
-
-def maxBipartiteMatching(weights):
-	#Kuhn Munkres @hungarian algorithm
-	#https://pypi.python.org/pypi/munkres/1.0.5.4
-    global U,V,S,T,Mu,Mv,lu,lv, minSlack, w
-    w  = weights
-    n  = len(w)
-    U  = V = range(n)
-    lu = [ max([w[u][v] for v in V]) for u in U]
-    lv = [ 0                         for v in V]
-    Mu = {}                                      
-    Mv = {}
-    while len(Mu)<n:
-        free = [u for u in V if u not in Mu]     
-        u0 = free[0]
-        S = {u0: True}                  
-        T = {}
-        minSlack = [[lu[u0]+lv[v]-w[u0][v], u0] for v in V]
-        augmentPath()
-    val = sum(lu)+sum(lv)
-    return (Mu, Mv, val)
 
 
 def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
@@ -273,21 +222,22 @@ def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 								continue
 							for subc2 in T[sn2]:
 								subQ2.put(subc2)
-						# if "".join(n1+n2) in G:
-						# 	if pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)] > G["".join(c1+c2)]:
-						# 		G["".join(n1+n2)] = pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)]
-						# else:
-						# 	G["".join(n1+n2)] = pwat["".join(n1+n2+c1+c2)] + G["".join(c1+c2)]
 						allCost = []
 						for c in nodesofSubtreec1:
 							for d in nodesofSubtreec2:
 								allCost.append(pwat["".join(c1+c2+c+d)] + G["".join(c+d)])
-						#bG["".join(c1+c2)] = max(allCost)
 						subCost.append(max(allCost))
 					Cost.append(subCost)
 				print F, H
 				print Cost
-				(n,n, val) = maxBipartiteMatching(Cost)
+			
+				m = Munkres()
+				CostMat = make_cost_matrix(Cost, lambda cost: sys.maxsize - cost)
+				indexes = m.compute(CostMat)
+				val = 0
+				for row, column in indexes:
+					v = Cost[row][column]
+					val += v
 				G["".join(n1+n2)] = val
 				print val
 								
@@ -309,10 +259,12 @@ if __name__ == '__main__':
 		#lca = findLCA('F', 'E', T1parent)
 		#print sap
 		#print pwat
+		#print maxBipartiteMatching([[1, 3]])
 		dfs = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
 		vals = dfs.values()
 		print "Output:", max(vals)
 		#print dfs
+		
 		
 
 	
