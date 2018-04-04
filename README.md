@@ -1,9 +1,14 @@
 # leafDelTED
+install munkres package for maximum bipartite matching as follows:
+```
+pip install munkres --user
+```
 
 To run leafDelTED.py, type the following command:
 ```
 python leafDelTED.py t1.txt t2.txt
 ```
+
 
 To generate random pair trees, run generateTrees.py as follows:
 ```

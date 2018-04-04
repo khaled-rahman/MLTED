@@ -2,7 +2,6 @@ import os
 import sys
 from sets import Set
 import Queue
-import matplotlib.pyplot as plt
 from munkres import Munkres, make_cost_matrix
 
 

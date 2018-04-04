@@ -2,8 +2,6 @@ import os
 import sys
 from sets import Set
 import Queue
-import networkx as nx
-import matplotlib.pyplot as plt
 from random import randint
 import numpy as np
 import argparse
