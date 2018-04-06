@@ -102,16 +102,6 @@ def readTreeFile(pathToFile):
 	treeFile.close()
 	return labels, nodes, adjList, parentList
 
-def createGraph(nodes, edges, cost):
-	G = nx.DiGraph()
-	for i in nodes:
-		G.add_node(i)
-	for e in range(len(edges)):
-		i = edges[e][0]
-		j = edges[e][1]
-		w = cost[e]
-		G.add_edge(i,j, weight = w, capacity = 1)
-
 def findLCA(node1, node2, T1parent):
 	nV1 = []
 	nV2 = []
@@ -180,22 +170,8 @@ def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 			if n2 in T:
 				H = [j for j in T[n2]]
 			#print n1, n2, ":", F, H
-			if len(F) == 0 and len(H) == 0:
-				G["".join(n1+n2)] = pwat["".join(n1+n2+n1+n2)]
-			elif len(F) == 0 and len(H) != 0:
-				for c in H:
-					if "".join(n1+n2) in G:
-						if pwat["".join(n1+n2+n1+c)] > G["".join(n1+n2)]:
-							G["".join(n1+n2)] =  pwat["".join(n1+n2+n1+c)]
-					else:
-						G["".join(n1+n2)] = pwat["".join(n1+n2+n1+c)]
-			elif len(F) != 0 and len(H) == 0:
-				for c in F:
-					if "".join(n1+n2) in G:
-						if pwat["".join(n1+n2+c+n2)] > G["".join(n1+n2)]:
-							G["".join(n1+n2)] = pwat["".join(n1+n2+c+n2)]
-					else:
-						G["".join(n1+n2)] = pwat["".join(n1+n2+c+n2)]
+			if len(F) == 0 or len(H) == 0:
+				G["".join(n1+n2)] = 0
 			else:
 				Cost = []
 				for c1 in F:
@@ -248,17 +224,13 @@ if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		l1, n1, T1adj, T1parent = readTreeFile(sys.argv[1])
 		l2, n2, T2adj, T2parent = readTreeFile(sys.argv[2])
-		#print l1
-		#print n1
-		#print T1adj
+		print n1
+		print n2
+		print T1adj
 		#print T1parent
 		#sap = SAP(l1, l2)
 		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent)
-		#print pwat
-		#lca = findLCA('F', 'E', T1parent)
-		#print sap
-		#print pwat
-		#print maxBipartiteMatching([[1, 3]])
+		print pwat
 		dfs = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
 		vals = dfs.values()
 		print "Output:", max(vals)
