@@ -120,29 +120,6 @@ def makeIterableAdjList(adj):
 	#print adjList
 	return adjList
 
-def AncDesc(l1, n1, t1, l2, n2, t2):
-	#print l1
-	#print n1
-	#print t1
-	#print l2
-	#print n2
-	#print t2
-	labels = []
-	for label1 in l1:
-		for label2 in label1:
-			labels.append(label2)
-	for t1l1 in range(len(labels)):
-		for t1lt in range(t1l1, len(labels)):
-			t1n1x,t1n1y = findIn2D(l1, labels[t1l1])
-			t1n2x,t1n2y = findIn2D(l1, labels[t1lt])
-			if n1[t1n1x] == n1[t1n2x]:
-				continue
-			rel1 = findRelation(n1[t1n1x], n1[t1n2x], t1)
-			print n1[t1n1x], n1[t1n2x], rel1
-	print labels
-	print t1
-	print l1
-
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Tree Generations', add_help=True)
 	parser.add_argument('-n', '--n', required=True, type=str, help='Number of nodes')

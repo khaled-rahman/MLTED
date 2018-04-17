@@ -131,6 +131,7 @@ def findLCA(node1, node2, T1parent):
 
 def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 	G = dict()
+	maxValues = []
 	dfsOrderT1 = []
 	dfsOrderT2 = []
 	STACK1 = []
@@ -214,11 +215,11 @@ def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 					v = Cost[row][column]
 					val += v
 				G["".join(n1+n2)] = val
-				print val
+				maxValues.append(val + pwat["".join(n1+n2+n1+n2)])
+				print "G[","".join(n1+n2),"]:", val
 								
 	print G
-
-	return G
+	return G, max(maxValues)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
@@ -230,10 +231,13 @@ if __name__ == '__main__':
 		#print T1parent
 		#sap = SAP(l1, l2)
 		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent)
-		print pwat
-		dfs = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
-		vals = dfs.values()
-		print "Output:", max(vals)
+		#print pwat
+		keys = sorted(pwat.keys())
+		for k in keys:
+			print k,":", pwat[k],
+		dfs, vals = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
+		#vals = dfs.values()
+		print "Output:", vals
 		#print dfs
 		
 		
