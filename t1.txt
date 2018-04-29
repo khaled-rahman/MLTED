@@ -1,6 +1,4 @@
-A=l1,l2
-B=l3,l4
-C=l5,l6
-D=l7
-A:B,C
-B:D
+N1=a
+N2=b,c,d,e,f
+N3=g,h,i,j
+N1:N2,N3

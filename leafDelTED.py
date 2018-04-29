@@ -27,15 +27,15 @@ def SAP(S, T):
 			Tab[i][j] = max(Tab[i-1][j], Tab[i][j-1])+len(list(set(S[i]).intersection(set(T[j]))))
 	return Tab
 
-def PWAT(nS, nT, S, T, Sparent, Tparent):
+def PWAT(nS, nT, S, T, Sparent, Tparent, rootS, rootT):
 	patDict = dict()
 	bfsOrderT1 = []
 	bfsOrderT2 = []
 	Q1 = Queue.Queue()
-	parent1 = S.iterkeys().next()
+	parent1 = rootS
 	Q1.put(parent1)
 	Q2 = Queue.Queue()
-	parent2 = T.iterkeys().next()
+	parent2 = rootT
 	Q2.put(parent2)
 
 	while not Q1.empty():
@@ -52,6 +52,8 @@ def PWAT(nS, nT, S, T, Sparent, Tparent):
 			continue
 		for c2 in T[p2]:
 			Q2.put(c2)
+	print bfsOrderT1
+	print bfsOrderT2
 
 	for a in bfsOrderT1:
 		Q1 = Queue.Queue()
@@ -63,6 +65,12 @@ def PWAT(nS, nT, S, T, Sparent, Tparent):
 				Q2.put(c)
 				while not Q2.empty():
 					d = Q2.get()
+					if "".join(a+c+b+d) in patDict:
+						print a,"+", c,"+", b, "+", d
+						print "".join(a+c+b+d), "=",patDict["".join(a+c+b+d)]
+						print "Already Exists!!"
+						print patDict
+						sys.exit(1)
 					if a == b and c == d:
 						patDict["".join(a+c+b+d)] = len(list(set(nS[b]).intersection(set(nT[d]))))
 					elif a == b and c != d:
@@ -89,6 +97,8 @@ def readTreeFile(pathToFile):
 	labels = []
 	adjList = dict()
 	parentList = dict()
+	root = -1
+	flag = 0
 	for line in treeFile.readlines():
 		if "=" in line:
 			n, l = createLabels(line)
@@ -96,11 +106,14 @@ def readTreeFile(pathToFile):
 			labels.append(l)
 		elif ":" in line:
 			p, c = createParentChildren(line)
+			if flag == 0:
+				root = p
+				flag = 1
 			adjList[p] = c
 			for label in c:
 				parentList[label] = p
 	treeFile.close()
-	return labels, nodes, adjList, parentList
+	return labels, nodes, adjList, parentList, root
 
 def findLCA(node1, node2, T1parent):
 	nV1 = []
@@ -123,22 +136,22 @@ def findLCA(node1, node2, T1parent):
 			lca = nV1[i]
 		else:
 			break
-	print lca
+	#print lca
 
 	return lca
 
 
 
-def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
+def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat, rootS, rootT):
 	G = dict()
 	maxValues = []
 	dfsOrderT1 = []
 	dfsOrderT2 = []
 	STACK1 = []
-	parent1 = S.iterkeys().next()
+	parent1 = rootS
 	STACK1.append(parent1)
 	STACK2 = []
-	parent2 = T.iterkeys().next()
+	parent2 = rootT
 	STACK2.append(parent2)
 	visited = []
 	while len(STACK1) > 0:
@@ -160,8 +173,7 @@ def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 		visited.append(p2)
 		for c2 in T[p2]:
 			STACK2.append(c2)
-	print dfsOrderT1
-	print dfsOrderT2
+	##print dfsOrderT2
 	for n1 in dfsOrderT1:
 		F = []
 		if n1 in S:
@@ -215,29 +227,28 @@ def optimalMatching(nS, nT, S, T, Sparent, Tparent, pwat):
 					v = Cost[row][column]
 					val += v
 				G["".join(n1+n2)] = val
-				maxValues.append(val + pwat["".join(n1+n2+n1+n2)])
-				print "G[","".join(n1+n2),"]:", val
+				maxValues.append(val+ pwat["".join(n1+n2+n1+n2)])
+				#print "G[","".join(n1+n2),"]:", val
 								
-	print G
+	#print G
 	return G, max(maxValues)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
-		l1, n1, T1adj, T1parent = readTreeFile(sys.argv[1])
-		l2, n2, T2adj, T2parent = readTreeFile(sys.argv[2])
+		l1, n1, T1adj, T1parent, r1 = readTreeFile(sys.argv[1])
+		l2, n2, T2adj, T2parent, r2 = readTreeFile(sys.argv[2])
 		print n1
-		print n2
 		print T1adj
-		#print T1parent
 		#sap = SAP(l1, l2)
-		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent)
+		pwat = PWAT(n1, n2, T1adj, T2adj, T1parent, T2parent, r1, r2)
 		#print pwat
-		keys = sorted(pwat.keys())
-		for k in keys:
-			print k,":", pwat[k],
-		dfs, vals = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat)
+		#keys = sorted(pwat.keys())
+		#for k in keys:
+		#	print k,":", pwat[k],",",
+		dfs, vals = optimalMatching(n1, n2, T1adj, T2adj, T1parent, T2parent, pwat, r1, r2)
 		#vals = dfs.values()
-		print "Output:", vals
+		print "Similarity:", vals
+		print "Distance:", sum(len(x) for x in l1)+sum(len(x) for x in l2) - 2 * vals
 		#print dfs
 		
 		
