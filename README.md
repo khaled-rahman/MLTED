@@ -1,5 +1,5 @@
 # How to run/use:
-Users need to check out the following instructions. We provide both Python and C++ implementations.
+Users need to check out the following instructions. We provide C++ implementation.
 
 ## Tree Structure
 We represent trees in the following way:
@@ -12,20 +12,7 @@ Root:Node1,Node2
 ```
 Each line of input contains either '=' or ':'. If a line contains '=', it means that left side of this sign represents a node and right side of it represents set of assigned labels to this node. If a line contains ':', it means that left side of it contains a node of the tree and right side of it contains children of that node (similar to adjacent list). First line that contains ':', represents the root node and its corresponding children. 
 
-Check t1.txt file for an example. t1.txt, t2.txt, t3.txt and t4.txt are example trees in the paper which represent Reference Tree, Tree 1, Tree 2 and Tree 3, respectively. N.B. Do not put a blank line in the tree file.
-
-## Python
-install munkres package for maximum bipartite matching as follows:
-```
-pip install munkres --user
-```
-
-To run leafDelTED.py, type the following command:
-```
-python leafDelTED.py t1.txt t2.txt
-```
-
-Output will be similarity and distance values.
+Check t1.txt file for an example. t1.txt, t2.txt, t3.txt and t4.txt are example trees used in the paper which represent 'true tree', 'inferred ree 1', 'inferred tree 2' and 'inferred tree 3', respectively. N.B. Do not put a blank line in the tree file.
 
 ## C++
 To run main.cpp, type the following command:
