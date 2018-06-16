@@ -40,3 +40,5 @@ f - specifies prefix of two output files' name. Here, test means two output file
 
 If you use this for any reason, please cite our paper.
 
+Nikolai Karpov, Salem Malikic, Md. Khaledur Rahman and S. Cenk Sahinalp, "A Multi-label Tree Edit Distance for Comparing "Clonal Trees" of Tumor Progression", 18th Workshop on Algorithms in Bioinformatics (WABI 2018), August, 2018, Helsinki, Finland.
+
