@@ -310,7 +310,9 @@ int main(int argc, char *argv[]) {
     }
     cerr << "\n";
   }
-  cout << "sim = " << res << "\n";
-  cout << "dist = " << t.nl + s.nl - 2 * res << "\n";
+  cout << "\nOutput:\n\n";
+  cout << "Distance = " << t.nl + s.nl - 2 * res << "\n";
+  cout << "Similarity = " << res << "\n";
+  cout << "Normalized Similarity = " << res*1.0/nlabel << "\n\n";
 
 }
