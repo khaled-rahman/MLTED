@@ -35,10 +35,3 @@ l - specifies number of labels that will be distributed among n nodes, which is 
 b - specifies highest number of branching factor which is 3
 f - specifies prefix of two output files' name. Here, test means two output files will be test1.txt and test2.txt
 ```
-
-## Citation
-
-If you use this for any reason, please cite our paper.
-
-Nikolai Karpov, Salem Malikic, Md. Khaledur Rahman and S. Cenk Sahinalp, "A Multi-label Tree Edit Distance for Comparing "Clonal Trees" of Tumor Progression", 18th Workshop on Algorithms in Bioinformatics (WABI 2018), August, 2018, Helsinki, Finland.
-
