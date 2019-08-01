@@ -1,3 +1,5 @@
+# A multi-labeled tree dissimilarity measure for comparing "clonal trees" of tumor progression
+
 # How to run/use:
 Users need to check out the following instructions. We provide C++ implementation.
 
@@ -41,3 +43,27 @@ l - specifies number of labels that will be distributed among n nodes, which is 
 b - specifies highest number of branching factor which is 3
 f - specifies prefix of two output files' name. Here, test means two output files will be test1.txt and test2.txt
 ```
+
+## Citations:
+If you find this tool helpful in your work, please cite the followings:
+```
+@article{karpov2019multi,
+  title={A multi-labeled tree dissimilarity measure for comparing “clonal trees” of tumor progression},
+  author={Karpov, Nikolai and Malikic, Salem and Rahman, Md Khaledur and Sahinalp, S Cenk},
+  journal={Algorithms for Molecular Biology},
+  volume={14},
+  number={1},
+  pages={17},
+  year={2019},
+  publisher={Springer}
+}
+@inproceedings{karpov2018multi,
+  title={A Multi-labeled Tree Edit Distance for Comparing" Clonal Trees" of Tumor Progression},
+  author={Karpov, Nikolai and Malikic, Salem and Rahman, Md and Sahinalp, S Cenk and others},
+  booktitle={18th International Workshop on Algorithms in Bioinformatics (WABI 2018)},
+  year={2018},
+  organization={Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik}
+}
+```
+
+If you have questions/comments, please don't hesitate to email me at `morahma@iu.edu`.
